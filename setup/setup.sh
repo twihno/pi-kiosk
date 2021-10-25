@@ -24,7 +24,7 @@ timedatectl set-timezone $VAR_TIMEZONE
 # Config raspi
 raspi-config nonint do_wifi_country $VAR_COUNTRY
 raspi-config nonint do_hostname $VAR_HOSTNAME
-raspi-config nonint do_overscan 0
+raspi-config nonint do_overscan 1
 raspi-config nonint do_configure_keyboard $VAR_KEYMAP
 raspi-config nonint do_change_locale $VAR_LOCALE
 
@@ -32,7 +32,19 @@ raspi-config nonint do_change_locale $VAR_LOCALE
 apt-get install raspberrypi-ui-mods -y
 
 # Activate auto login
-raspi-config nonint do_boot_behaviour "B3"
+raspi-config nonint do_boot_behaviour "B4"
+
+# Install unattended upgrade
+apt-get install unattended-upgrades -y
+
+# Install Firefox ESR
+apt-get install firefox-esr -y
+
+# Remove Screensaver
+apt-get purge xscreensaver -y
+apt-get autoremove -y
+apt-get clean
+raspi-config nonint do_blanking 1
 
 # Reboot system
 reboot now
