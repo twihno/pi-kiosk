@@ -28,4 +28,11 @@ raspi-config nonint do_overscan 0
 raspi-config nonint do_configure_keyboard $VAR_KEYMAP
 raspi-config nonint do_change_locale $VAR_LOCALE
 
+# Install PIXEL UI
+apt install raspberrypi-ui-mods -y
 
+# Activate auto login
+raspi-config nonint do_boot_behaviour "B3"
+
+# Reboot system
+reboot now
