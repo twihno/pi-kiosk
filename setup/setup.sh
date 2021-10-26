@@ -2,17 +2,43 @@
 
 VAR_COUNTRY="DE"
 VAR_TIMEZONE="Europe/Berlin" # timedatectl list-timezones
-VAR_HOSTNAME="raspikiosk"
 VAR_KEYMAP="de"
 VAR_LOCALE="de_DE.UTF-8 UTF-8" # /usr/share/i18n/SUPPORTED
-
-echo -e "---Raspberry Pi Firefox Kiosk Setup---\n"
+VAR_HOSTNAME="raspikiosk"
 
 # Check for root permissions
-if [ "$EUID" -ne 0 ]
-then
+if [ "$EUID" -ne 0 ]; then
   echo -e "This script requires root permissions.\nPlease start this script as root (e.g. sudo <script>)."
   exit 1
+fi
+
+TITLE="PI Kiosk Setup"
+
+function changeSettings () {
+  VAR_COUNTRY="$(whiptail --inputbox "Which country do you live in?" --title "$TITLE" 8 60 "$VAR_COUNTRY" --nocancel 3>&1 1>&2 2>&3)"
+  VAR_TIMEZONE="$(whiptail --inputbox "Which timezone do you live in?\nSupported timezones: timedatectl list-timezones" --title "$TITLE" 8 60 "$VAR_TIMEZONE" --nocancel 3>&1 1>&2 2>&3)"
+  VAR_KEYMAP="$(whiptail --inputbox "Which keymap do you use?" --title "$TITLE" 8 60 "$VAR_KEYMAP" --nocancel 3>&1 1>&2 2>&3)"
+  VAR_LOCALE="$(whiptail --inputbox "Which locale do you want to use?\nSupported values: /usr/share/i18n/SUPPORTED" --title "$TITLE" 8 60 "$VAR_LOCALE" --nocancel 3>&1 1>&2 2>&3)"
+  VAR_HOSTNAME="$(whiptail --inputbox "Which hostname do you want to use?" --title "$TITLE" 8 60 "$VAR_HOSTNAME" --nocancel 3>&1 1>&2 2>&3)"
+}
+
+if [ "$1" == "nonint" ]; then
+  NO_QUESTIONS=1
+fi
+
+if [ $NO_QUESTIONS ]; then
+  echo -e "--- $TITLE ---\n"
+else
+  if ( ! whiptail --title "$TITLE" --yesno "Would you like to start the setup?" 8 60); then
+    exit 1
+  fi
+fi
+
+if [ ! $NO_QUESTIONS ]; then
+  echo "here"
+  while ( ! whiptail --yesno "Are the following settings correct?\n\nCOUNTRY:    $VAR_COUNTRY\nTIMENZONE:  $VAR_TIMEZONE\nKEYMAP:     $VAR_KEYMAP\nLOCALE:     $VAR_LOCALE\nHOSTNAME:   $VAR_HOSTNAME\n" --title "$TITLE" 13 60 ); do
+  changeSettings
+  done
 fi
 
 # Upgrade every package
@@ -36,6 +62,7 @@ raspi-config nonint do_boot_behaviour "B4"
 
 # Install unattended upgrade
 apt-get install unattended-upgrades -y
+cp "${BASH_SOURCE%/*}/50unattended-upgrades" "/etc/apt/apt.conf.d"
 
 # Install Firefox ESR
 apt-get install firefox-esr -y
@@ -45,6 +72,23 @@ apt-get purge xscreensaver -y
 apt-get autoremove -y
 apt-get clean
 raspi-config nonint do_blanking 1
+
+# Enable autostart
+cp "${BASH_SOURCE%/*}/autostart" "/etc/xdg/lxsession/LXDE-pi"
+
+# Update splashscreen
+cp "${BASH_SOURCE%/*}/splash.png" "/usr/share/plymouth/themes/pix"
+
+# Require password for sudo
+echo -e "pi ALL=(ALL) PASSWD: ALL\n" > /etc/sudoers.d/010_pi-nopasswd
+
+# Install firewall
+apt install ufw -y
+ufw enable
+
+# Change pi user password
+echo "Changing password for user \"pi\""
+passwd pi
 
 # Reboot system
 reboot now
