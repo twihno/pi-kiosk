@@ -1,3 +1,4 @@
 @lxpanel --profile LXDE-pi
 @pcmanfm --desktop --profile LXDE-pi
 @firefox --kiosk https://google.com
+@unclutter

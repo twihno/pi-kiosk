@@ -12,6 +12,8 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+cd "${BASH_SOURCE%/*}"
+
 TITLE="PI Kiosk Setup"
 
 function changeSettings () {
@@ -54,6 +56,9 @@ raspi-config nonint do_overscan 1
 raspi-config nonint do_configure_keyboard $VAR_KEYMAP
 raspi-config nonint do_change_locale $VAR_LOCALE
 
+# Remove swap
+apt-get purge dphys-swapfile
+
 # Install PIXEL UI
 apt-get install raspberrypi-ui-mods -y
 
@@ -62,33 +67,45 @@ raspi-config nonint do_boot_behaviour "B4"
 
 # Install unattended upgrade
 apt-get install unattended-upgrades -y
-cp "${BASH_SOURCE%/*}/50unattended-upgrades" "/etc/apt/apt.conf.d"
+cp "./50unattended-upgrades" "/etc/apt/apt.conf.d"
 
 # Install Firefox ESR
 apt-get install firefox-esr -y
 
+# Install Firefox config
+cp "./autoconfig.js" "/usr/lib/firefox-esr/defaults/pref"
+cp "./firefox.cfg" "/usr/lib/firefox-esr/"
+
 # Remove Screensaver
 apt-get purge xscreensaver -y
-apt-get autoremove -y
-apt-get clean
+
 raspi-config nonint do_blanking 1
 
 # Enable autostart
-cp "${BASH_SOURCE%/*}/autostart" "/etc/xdg/lxsession/LXDE-pi"
+cp "./autostart" "/etc/xdg/lxsession/LXDE-pi"
 
 # Update splashscreen
-cp "${BASH_SOURCE%/*}/splash.png" "/usr/share/plymouth/themes/pix"
+cp "./splash.png" "/usr/share/plymouth/themes/pix"
 
-# Require password for sudo
-echo -e "pi ALL=(ALL) PASSWD: ALL\n" > /etc/sudoers.d/010_pi-nopasswd
+# Install unclutter
+# Hack for buster; replace with apt install for bullseye and above
+curl -fOL http://ftp.de.debian.org/debian/pool/main/u/unclutter-xfixes/unclutter-xfixes_1.5-3_armhf.deb
+apt install ./unclutter-xfixes_1.5-3_armhf.deb -y
 
 # Install firewall
 apt install ufw -y
 ufw enable
 
+# Remove unused dependencies
+apt-get autoremove -y
+apt-get clean
+
 # Change pi user password
 echo "Changing password for user \"pi\""
 passwd pi
+
+# Require password for sudo
+echo -e "pi ALL=(ALL) PASSWD: ALL\n" > /etc/sudoers.d/010_pi-nopasswd
 
 # Reboot system
 reboot now
