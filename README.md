@@ -1,5 +1,5 @@
 # Pi Kiosk
-Simplte, single page firefox kiosk for raspberry pi
+Simple, single page firefox kiosk for raspberry pi
 
 # Features
 - (Almost) no need for maintenance
