@@ -37,7 +37,6 @@ else
 fi
 
 if [ ! $NO_QUESTIONS ]; then
-  echo "here"
   while ( ! whiptail --yesno "Are the following settings correct?\n\nCOUNTRY:    $VAR_COUNTRY\nTIMENZONE:  $VAR_TIMEZONE\nKEYMAP:     $VAR_KEYMAP\nLOCALE:     $VAR_LOCALE\nHOSTNAME:   $VAR_HOSTNAME\n" --title "$TITLE" 13 60 ); do
   changeSettings
   done
