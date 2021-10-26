@@ -66,22 +66,14 @@ raspi-config nonint do_boot_behaviour "B4"
 
 # Install unattended upgrade
 apt-get install unattended-upgrades -y
-cp "./50unattended-upgrades" "/etc/apt/apt.conf.d"
 
 # Install Firefox ESR
 apt-get install firefox-esr -y
-
-# Install Firefox config
-cp "./autoconfig.js" "/usr/lib/firefox-esr/defaults/pref"
-cp "./firefox.cfg" "/usr/lib/firefox-esr/"
 
 # Remove Screensaver
 apt-get purge xscreensaver -y
 
 raspi-config nonint do_blanking 1
-
-# Enable autostart
-cp "./autostart" "/etc/xdg/lxsession/LXDE-pi"
 
 # Update splashscreen
 cp "./splash.png" "/usr/share/plymouth/themes/pix"
