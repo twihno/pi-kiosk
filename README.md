@@ -11,6 +11,9 @@ A simple, single page Firefox webkiosk for Raspberry Pi
 # Required Hardware
 A Raspberry Pi and a compatible monitor/display (the performance obviously differs between pi generations)
 
+# OS
+This script has been developed and tested on Raspberry Pi OS Lite Buster (Debian 10).
+
 # Setup
 - Flash Raspberry Pi OS Lite to a SD card (more information: https://www.raspberrypi.com/software/)
 - Boot the pi (display required)
