@@ -56,7 +56,7 @@ raspi-config nonint do_configure_keyboard $VAR_KEYMAP
 raspi-config nonint do_change_locale $VAR_LOCALE
 
 # Remove swap
-apt-get purge dphys-swapfile
+apt-get purge dphys-swapfile -y
 
 # Install PIXEL UI
 apt-get install raspberrypi-ui-mods -y
@@ -85,11 +85,16 @@ apt install ./unclutter-xfixes_1.5-3_armhf.deb -y
 
 # Install firewall
 apt install ufw -y
-ufw enable
 
 # Remove unused dependencies
 apt-get autoremove -y
-apt-get clean
+apt-get clean -y
+
+# Apply config
+sudo ./apply_config.sh
+
+# Enable firewall
+ufw enable
 
 # Change pi user password
 echo "Changing password for user \"pi\""
@@ -97,6 +102,7 @@ passwd pi
 
 # Require password for sudo
 echo -e "pi ALL=(ALL) PASSWD: ALL\n" > /etc/sudoers.d/010_pi-nopasswd
+
 
 # Reboot system
 reboot now
