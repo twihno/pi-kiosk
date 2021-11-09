@@ -79,9 +79,7 @@ raspi-config nonint do_blanking 1
 cp "./splash.png" "/usr/share/plymouth/themes/pix"
 
 # Install unclutter
-# Hack for buster; replace with apt install for bullseye and above
-curl -fOL http://ftp.de.debian.org/debian/pool/main/u/unclutter-xfixes/unclutter-xfixes_1.5-3_armhf.deb
-apt install ./unclutter-xfixes_1.5-3_armhf.deb -y
+apt install unclutter-xfixes -y
 
 # Install firewall
 apt install ufw -y
@@ -102,7 +100,6 @@ passwd pi
 
 # Require password for sudo
 echo -e "pi ALL=(ALL) PASSWD: ALL\n" > /etc/sudoers.d/010_pi-nopasswd
-
 
 # Reboot system
 reboot now
