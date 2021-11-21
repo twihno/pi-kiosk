@@ -4,7 +4,7 @@ A simple, single page Firefox webkiosk for Raspberry Pi
 # Features
 - (Almost) no need for maintenance
   - Unattended Upgrades
-  - No SSH enabled
+  - No SSH enabled (to enable ssh, you have to execute ```sudo ufw enable ssh```)
 - Firefox ESR
 - Automatic install script
 
